@@ -1,0 +1,32 @@
+#cloud-config
+# =============================================================================
+# CR380 — Docker Swarm Lab — Cloud-Init User Data
+# =============================================================================
+# Provisions a fresh Ubuntu VM with Docker Engine and all tools
+# required for the Swarm labs.
+# =============================================================================
+
+package_update: true
+package_upgrade: true
+
+packages:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - gnupg
+  - lsb-release
+  - jq
+  - git
+  - tree
+
+runcmd:
+  # Install Docker Engine (official method)
+  - curl -fsSL https://get.docker.com | sh
+  # Add default user to docker group
+  - usermod -aG docker ubuntu
+  # Clone the lab repository
+  - su - ubuntu -c "git clone https://github.com/chrystel-nintcheu/CR380-docker-swarm-lab.git /home/ubuntu/CR380-docker-swarm-lab"
+  # Verify
+  - docker --version
+
+final_message: "CR380 Docker Swarm Lab VM ready — $UPTIME seconds"
