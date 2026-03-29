@@ -1,0 +1,34 @@
+# =============================================================================
+# CR380 — Docker Swarm Lab — Stack Database
+# =============================================================================
+# FR: Pile de base de données : MariaDB + Adminer sur réseau overlay scalenet
+# EN: Database stack: MariaDB + Adminer on scalenet overlay network
+# =============================================================================
+
+volumes:
+  mariadb_data:
+    driver: local
+
+networks:
+  scalenet:
+    external: true
+
+services:
+  mariadb:
+    image: mariadb:latest
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: drupal
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - scalenet
+
+  adminer:
+    image: adminer:latest
+    ports:
+      - "8081:8080"
+    networks:
+      - scalenet

@@ -1,0 +1,26 @@
+# =============================================================================
+# CR380 — Docker Swarm Lab — Stack Drupal (Web App)
+# =============================================================================
+# FR: Pile application web : Drupal sur réseau overlay scalenet
+# EN: Web app stack: Drupal on scalenet overlay network
+# =============================================================================
+
+volumes:
+  drupal_data:
+    driver: local
+
+networks:
+  scalenet:
+    external: true
+
+services:
+  drupal:
+    image: drupal:latest
+    deploy:
+      replicas: 1
+    ports:
+      - "80:80"
+    volumes:
+      - drupal_data:/var/www/html
+    networks:
+      - scalenet
