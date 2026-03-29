@@ -137,9 +137,25 @@ run_test() {
         "Vérifions que Adminer est accessible via HTTP.\nCommande: curl -s http://localhost:${PORT_ADMINER}\n\nAdminer est une interface web de gestion de base de données." \
         "Let's verify Adminer is accessible via HTTP.\nCommand: curl -s http://localhost:${PORT_ADMINER}\n\nAdminer is a web-based database management interface."
 
-    # Give Adminer a moment to start
-    sleep 5
-    assert_http_reachable "http://localhost:${PORT_ADMINER}" 200
+    # Give Adminer time to start, with retries
+    local max_wait="${TIMEOUT_CONTAINER_READY}"
+    local elapsed=0
+    local adminer_code="000"
+    while (( elapsed < max_wait )); do
+        adminer_code=$(curl -4 -s -o /dev/null -w '%{http_code}' --max-time 5 "http://localhost:${PORT_ADMINER}" 2>/dev/null) || adminer_code="000"
+        if [[ "${adminer_code}" =~ ^(200|301|302)$ ]]; then
+            break
+        fi
+        sleep 5
+        elapsed=$(( elapsed + 5 ))
+    done
+    if [[ "${adminer_code}" =~ ^(200|301|302)$ ]]; then
+        pass "HTTP ${adminer_code} from http://localhost:${PORT_ADMINER}"
+    else
+        fail "HTTP check http://localhost:${PORT_ADMINER}" \
+             "HTTP 200" "HTTP ${adminer_code}" \
+             "Adminer peut prendre du temps à démarrer. Vérifiez: docker service logs ${STACK_NAME}_${SVC_ADMINER}"
+    fi
 
     # -------------------------------------------------------------------------
     # Step 8: Find containers with docker ps

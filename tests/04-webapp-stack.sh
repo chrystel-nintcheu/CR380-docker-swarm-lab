@@ -105,17 +105,24 @@ run_test() {
         "Vérifions que Drupal est accessible via HTTP.\nCommande: curl -s http://localhost:${PORT_DRUPAL}\n\nDrupal peut répondre avec un code 200 ou 302 (redirection\nvers la page d'installation)." \
         "Let's verify Drupal is accessible via HTTP.\nCommand: curl -s http://localhost:${PORT_DRUPAL}\n\nDrupal may respond with a 200 or 302 (redirect\nto installation page)."
 
-    # Give Drupal a moment to start
-    sleep 10
-
-    local drupal_code
-    drupal_code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 "http://localhost:${PORT_DRUPAL}" 2>/dev/null) || drupal_code="000"
+    # Give Drupal time to start, with retries
+    local max_wait="${TIMEOUT_CONTAINER_READY}"
+    local elapsed=0
+    local drupal_code="000"
+    while (( elapsed < max_wait )); do
+        drupal_code=$(curl -4 -s -o /dev/null -w '%{http_code}' --max-time 10 "http://localhost:${PORT_DRUPAL}" 2>/dev/null) || drupal_code="000"
+        if [[ "${drupal_code}" =~ ^(200|302|303)$ ]]; then
+            break
+        fi
+        sleep 5
+        elapsed=$(( elapsed + 5 ))
+    done
     if [[ "${drupal_code}" =~ ^(200|302|303)$ ]]; then
         pass "Drupal responds (HTTP ${drupal_code}) on port ${PORT_DRUPAL}"
     else
         fail "Drupal HTTP check" \
              "HTTP 200/302/303" "HTTP ${drupal_code}" \
-             "Drupal peut prendre du temps à démarrer. Attendez et réessayez."
+             "Drupal peut prendre du temps à démarrer. Vérifiez: docker service logs ${STACK_NAME}_${SVC_DRUPAL}"
     fi
 
     # -------------------------------------------------------------------------

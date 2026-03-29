@@ -51,11 +51,13 @@ run_test() {
         pass "Running as root / Exécution en tant que root"
     elif sudo -n true 2>/dev/null; then
         pass "sudo access available / Accès sudo disponible"
+    elif docker info &>/dev/null; then
+        pass "Docker socket accessible (docker group) / Socket Docker accessible (groupe docker)"
     else
-        fail "sudo access not available / Accès sudo non disponible" \
-             "sudo -n true exits 0" \
-             "sudo requires a password" \
-             "Exécutez avec sudo: sudo ./run-labs.sh / Run with sudo: sudo ./run-labs.sh"
+        fail "No Docker access / Pas d'accès Docker" \
+             "root, sudo, or docker group membership" \
+             "neither sudo nor docker socket accessible" \
+             "Exécutez avec sudo ou ajoutez-vous au groupe docker / Run with sudo or add yourself to docker group"
     fi
 
     # -------------------------------------------------------------------------

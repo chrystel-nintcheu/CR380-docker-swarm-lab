@@ -662,7 +662,7 @@ assert_http_reachable() {
     local http_timeout="${3:-15}"
 
     local http_code
-    http_code=$(curl -s -o /dev/null -w '%{http_code}' --max-time "${http_timeout}" "${url}" 2>/dev/null) || http_code="000"
+    http_code=$(curl -4 -s -o /dev/null -w '%{http_code}' --max-time "${http_timeout}" "${url}" 2>/dev/null) || http_code="000"
 
     if [[ "${http_code}" == "${expected_code}" ]] || [[ "${http_code}" == "301" ]] || [[ "${http_code}" == "302" ]]; then
         pass "HTTP ${http_code} from ${url}"
