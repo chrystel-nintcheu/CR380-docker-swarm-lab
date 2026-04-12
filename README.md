@@ -86,10 +86,21 @@ sudo bash run-labs.sh --verbose          # Sortie détaillée
 
 ## Provisionnement VM / VM Provisioning
 
-### Avec Multipass
+### Avec Multipass (Linux / macOS)
 
 ```bash
 bash cloud-init/provision-multipass.sh
+```
+
+### Avec Multipass (Windows)
+
+Installez Multipass depuis <https://multipass.run>, puis dans une invite de commandes :
+
+Install Multipass from <https://multipass.run>, then in a command prompt:
+
+```bat
+cloud-init\provision-multipass.bat
+cloud-init\provision-multipass.bat mon-vm-custom
 ```
 
 ### Cloud-init direct
@@ -101,6 +112,7 @@ Utilisez `cloud-init/user-data-fresh.yaml` comme user-data pour votre VM cloud o
 ```
 CR380-docker-swarm-lab/
 ├── config.env                          # Configuration centrale
+├── .gitattributes                      # Fin de ligne / Line endings
 ├── run-labs.sh                         # Runner principal
 ├── run-teacher-validation.sh           # Validation enseignant
 ├── .gitbook.yaml                       # GitBook configuration
@@ -131,7 +143,8 @@ CR380-docker-swarm-lab/
 │       └── lab-99-teardown.md
 ├── cloud-init/
 │   ├── user-data-fresh.yaml
-│   └── provision-multipass.sh
+│   ├── provision-multipass.sh          # Linux / macOS
+│   └── provision-multipass.bat         # Windows
 ├── results/                            # Rapports JSON (git-ignored)
 └── logs/                               # Journaux (git-ignored)
 ```
